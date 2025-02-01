@@ -27,6 +27,22 @@ dependencies {
 	// poi -> word 생성 및 조작
 	implementation 'org.apache.poi:poi:5.3.0' // https://mvnrepository.com/artifact/org.apache.poi/poi
 	implementation 'org.apache.poi:poi-ooxml:5.3.0' // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+	implementation 'org.apache.pdfbox:pdfbox:3.0.4' // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
+
+	// docx -> pdf converting
+	implementation 'org.docx4j:docx4j-core:11.4.9' // https://mvnrepository.com/artifact/org.docx4j/docx4j
+	implementation 'org.docx4j:docx4j-export-fo:11.4.9'
+	implementation 'org.apache.xmlgraphics:fop:2.9' // https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop
+
+	// jaxb
+	implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.2'
+	implementation 'org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9'
+	implementation 'org.docx4j:docx4j-JAXB-Internal:8.3.9'
+
+
+//	implementation 'org.docx4j:docx4j-core:11.5.2' // https://mvnrepository.com/artifact/org.docx4j/docx4j-core
+//	implementation 'org.docx4j:docx4j-export-fo:11.5.2' // https://mvnrepository.com/artifact/org.docx4j/docx4j-export-fo
+
 
 	// logging
 	implementation 'org.apache.logging.log4j:log4j-core:2.21.1' // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core

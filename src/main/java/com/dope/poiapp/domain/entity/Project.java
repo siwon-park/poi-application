@@ -1,9 +1,6 @@
-package com.doconsult.poiapp.domain;
+package com.dope.poiapp.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -25,16 +22,13 @@ public class Project {
 
     private String projectManager; // PM
 
-    private String company; // 고객사
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 
     private String customer; // 고객 담당자
-
-    private String address; // 고객사 주소
 
     private Date startDate; // 프로젝트 시작일
 
     private Date endDate; // 종료일
-
-    private Date finishDate; // 프로젝트 종료일
-
 }

@@ -1,17 +1,15 @@
-package com.doconsult.poiapp.service;
+package com.dope.poiapp.service;
 
-import com.doconsult.poiapp.domain.Project;
-import com.doconsult.poiapp.repository.ProjectRepository;
+import com.dope.poiapp.domain.entity.Project;
+import com.dope.poiapp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.util.IOUtils;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.apache.poi.xwpf.usermodel.*;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -25,16 +23,21 @@ public class PoiService {
 
     private final ProjectRepository projectRepository;
 
-    public void create(long pid) throws FileNotFoundException, IOException {
-//        FileInputStream fis = new FileInputStream("C:\\Users\\zow77\\Downloads\\WordTemplate.docx");
-        FileInputStream fis = new FileInputStream(templateFilePath);
+    /**
+     * TODO: project나 company 객체를 사용하지 말고 DTO 사용으로 변경 필요 (25-02-01)
+     * */
+    public byte[] createWord(long pid) throws FileNotFoundException, IOException {
+        FileInputStream fis = new FileInputStream(templateFilePath); // "C:\\Users\\zow77\\Downloads\\WordTemplate.docx"
         XWPFDocument document = new XWPFDocument(fis);
         List<XWPFParagraph> paragraphs = document.getParagraphs(); // 문서 패러그래프의 정보
         Project project = projectRepository.findById(pid).orElseThrow();
-        String company = project.getCompany();
-        Date finishDate = project.getFinishDate();
+        String company = project.getCompany().getName();
+        Date finishDate = project.getEndDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일");
         String finDate = sdf.format(finishDate);
+
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMdd");
+        String newFileName = "개발완료확인서_" + company + "_" + sdf2.format(finishDate) + ".docx";
 
         XWPFRun run;
         run = paragraphs.get(19).getRuns().get(0); // 19번째 패러그래프의 런 정보의 첫번째 값부터 가져옴; 날짜
@@ -80,7 +83,7 @@ public class PoiService {
                         cell.getParagraphs().get(0).getRuns().get(0).setFontFamily("맑은 고딕");
                     }
                     if (cellNo == 9) { // 개발 완료 확인 일자
-                        cell.setText(sdf.format(project.getFinishDate()));
+                        cell.setText(sdf.format(project.getEndDate()));
                         cell.getParagraphs().get(0).getRuns().get(0).setFontFamily("맑은 고딕");
                     }
                     if (cellNo == 14) { // 개발 내역
@@ -104,9 +107,9 @@ public class PoiService {
                     }
                     if (cellNo == 19) { // 확인자
                         XWPFRun cellRun = cell.getParagraphs().get(0).createRun();
-                        cellRun.setText("고객사 : ㈜" + project.getCompany());
+                        cellRun.setText("고객사 : ㈜" + project.getCompany().getName());
                         cell.getParagraphs().get(0).getRuns().get(0).setFontFamily("맑은 고딕");
-                        cell.addParagraph().createRun().setText("주  소 : " + project.getAddress());
+                        cell.addParagraph().createRun().setText("주  소 : " + project.getCompany().getAddress());
                         cell.getParagraphs().get(1).getRuns().get(0).setFontFamily("맑은 고딕");
                         cell.addParagraph().createRun().setText("고객담당자 :    " + project.getCustomer() + "   (서명)");
                         cell.getParagraphs().get(2).getRuns().get(0).setFontFamily("맑은 고딕");
@@ -116,58 +119,11 @@ public class PoiService {
             }
         }
 
-
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMdd");
-        String newFileName = "개발완료확인서_" + company + "_" + sdf2.format(finishDate) + ".docx";
-        FileOutputStream fos = new FileOutputStream("C:\\Users\\zow77\\Downloads\\" + newFileName);
-        document.write(fos);
+//        FileOutputStream fos = new FileOutputStream("C:\\Users\\zow77\\Downloads\\" + newFileName);
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        document.write(fos); // XWPFDocument 객체(document)의 내용을 fos에 바이트 스트림으로 저장함
         IOUtils.closeQuietly(fos);
         document.close();
+        return fos.toByteArray();
     }
-
-    public void readTest() throws FileNotFoundException, IOException {
-        FileInputStream fis = new FileInputStream("C:\\Users\\SIWON\\Downloads\\WordTemplate.docx");
-        XWPFDocument document = new XWPFDocument(fis);
-
-        // 문서의 모든 단락을 가져옴 -> 단락만 읽음
-        int p = 1;
-        for (XWPFParagraph paragraph : document.getParagraphs()) {
-            // 단락의 텍스트 출력
-            System.out.println("paragraph: " + (p++));
-            System.out.println(paragraph.getText());
-        }
-
-        int c = 1;
-        for (XWPFTable table : document.getTables()) {
-            for (XWPFTableRow row : table.getRows()) {
-                for (XWPFTableCell cell : row.getTableCells()) {
-                    System.out.println("cell Text " + (c++) + " " + cell.getText());
-                }
-            }
-        }
-    }
-
-    // 테스트용
-    public void readAndWrite() throws FileNotFoundException, IOException {
-        FileInputStream fis = new FileInputStream("C:\\Users\\SIWON\\Downloads\\WordTemplate.docx");
-        FileOutputStream fos = new FileOutputStream("C:\\Users\\SIWON\\Downloads\\개발완료확인서_수정.docx");
-        XWPFDocument document = new XWPFDocument(fis);
-
-        List<XWPFParagraph> paragraphs = document.getParagraphs();
-
-        // run: 입력 내용?
-        XWPFRun run;
-        run = paragraphs.get(19).getRuns().get(0); // 19번째 패러그래프의 런 정보의 첫번째 값부터 가져옴; 날짜
-        run.setText("2024년 10월 05일", 0);
-        int runSize = paragraphs.get(19).getRuns().size();
-        for (int i = runSize - 1; i > 0; i--) {
-            paragraphs.get(19).removeRun(i);
-        }
-        document.write(fos);
-        IOUtils.closeQuietly(fos);
-        document.close();
-    }
-
-
-
 }

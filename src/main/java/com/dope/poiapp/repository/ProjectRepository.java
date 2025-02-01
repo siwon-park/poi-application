@@ -1,6 +1,6 @@
-package com.doconsult.poiapp.repository;
+package com.dope.poiapp.repository;
 
-import com.doconsult.poiapp.domain.Project;
+import com.dope.poiapp.domain.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
