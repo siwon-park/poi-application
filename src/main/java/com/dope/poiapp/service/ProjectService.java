@@ -37,4 +37,18 @@ public class ProjectService {
         }
         return projects;
     }
+
+    /*
+    * TODO: 프로젝트는 생성 시 id 값을 알지 못함 -> Company는 이름으로 식별이 가능하긴 함
+    * */
+    public Project createProject() {
+        Project project = null;
+        if (project == null) { // 신규 생성
+
+        } else { // 변경
+            
+        }
+
+        return projectRepository.save(project);
+    }
 }
