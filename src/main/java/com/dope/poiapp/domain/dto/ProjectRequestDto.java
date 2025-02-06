@@ -12,6 +12,8 @@ import java.util.Date;
 public class ProjectRequestDto {
     private String projectName;
     private String projectManager;
+    private String projectDescription;
+    private String projectCustomer;
     private String companyName;
     private Date startDate;
     private Date endDate;

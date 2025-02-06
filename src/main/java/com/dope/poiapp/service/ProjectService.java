@@ -42,9 +42,6 @@ public class ProjectService {
         return projects;
     }
 
-    /*
-    * TODO: 프로젝트는 생성 시 id 값을 알지 못함 -> Company는 이름으로 식별이 가능하긴 함
-    * */
     public void createProject(ProjectRequestDto requestDto) {
         Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
         if (company == null) {
@@ -63,14 +60,21 @@ public class ProjectService {
         return;
     }
 
+    // TODO: requestDTO에 id까지 담아서 주는 게 맞을까?
     public void updateProject(long id, ProjectRequestDto requestDto) {
         Project project = projectRepository.findById(id).orElse(null);
-        if (project == null) {
-            // 프로젝트가 없으므로 수정 못함
+        if (project == null) { // 프로젝트가 없으므로 수정 못함
+            return;
+        }
+        Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
+        if (company == null) { // 회사가 없으므로 수정 못함
             return;
         }
         project.updateName(requestDto.getProjectName());
         project.updateProjectManager(requestDto.getProjectManager());
+        project.updateDescription(requestDto.getProjectDescription());
+        project.updateCompany(company);
+        project.updateCustomer(requestDto.getProjectCustomer());
         project.updateStartDate(requestDto.getStartDate());
         project.updateEndDate(requestDto.getEndDate());
         projectRepository.save(project);
