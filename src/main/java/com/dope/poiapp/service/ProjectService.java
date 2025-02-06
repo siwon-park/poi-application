@@ -1,6 +1,9 @@
 package com.dope.poiapp.service;
 
+import com.dope.poiapp.domain.dto.ProjectRequestDto;
+import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.domain.entity.Project;
+import com.dope.poiapp.repository.CompanyRepository;
 import com.dope.poiapp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import java.util.List;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final CompanyRepository companyRepository;
 
     public Project getProject(long id) {
         return projectRepository.findById(id).orElse(null);
@@ -41,14 +45,42 @@ public class ProjectService {
     /*
     * TODO: 프로젝트는 생성 시 id 값을 알지 못함 -> Company는 이름으로 식별이 가능하긴 함
     * */
-    public Project createProject() {
-        Project project = null;
-        if (project == null) { // 신규 생성
-
-        } else { // 변경
-            
+    public void createProject(ProjectRequestDto requestDto) {
+        Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
+        if (company == null) {
+            // 회사가 없으므로 프로젝트를 등록 못함
+            return;
         }
-
-        return projectRepository.save(project);
+        // 신규 프로젝트
+        Project project = Project.builder()
+                .name(requestDto.getProjectName())
+                .projectManager(requestDto.getProjectManager())
+                .company(company)
+                .startDate(requestDto.getStartDate())
+                .endDate(requestDto.getEndDate())
+                .build();
+        projectRepository.save(project);
+        return;
     }
+
+    public void updateProject(long id, ProjectRequestDto requestDto) {
+        Project project = projectRepository.findById(id).orElse(null);
+        if (project == null) {
+            // 프로젝트가 없으므로 수정 못함
+            return;
+        }
+        project.updateName(requestDto.getProjectName());
+        project.updateProjectManager(requestDto.getProjectManager());
+        project.updateStartDate(requestDto.getStartDate());
+        project.updateEndDate(requestDto.getEndDate());
+        projectRepository.save(project);
+        return;
+    }
+
+    // 프로젝트는 hard delete
+    public void deleteProject(long id) {
+        projectRepository.deleteById(id);
+        return;
+    }
+
 }
