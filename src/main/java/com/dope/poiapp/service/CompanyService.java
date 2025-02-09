@@ -4,6 +4,9 @@ import com.dope.poiapp.domain.dto.CompanyRequestDto;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,12 +48,10 @@ public class CompanyService {
         return companyRepository.findAll();
     }
 
-    /*
-    * TODO:
-    *  1) 회사명으로 검색했을 때 페이지네이션
-    *  2) 기본 회사 정보들 페이지네이션
-    * */
-
+    public Page<Company> getAllCompanies(int page) {
+        Pageable pageable = PageRequest.of(page, 20); // 한 페이지에 20개
+        return companyRepository.findAll(pageable);
+    }
 
 
 }

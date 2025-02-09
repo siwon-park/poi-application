@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayOutputStream;
 
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class PoiController {
 
     private final PoiService poiService;

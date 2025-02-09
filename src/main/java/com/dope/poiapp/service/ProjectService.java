@@ -6,6 +6,9 @@ import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.repository.CompanyRepository;
 import com.dope.poiapp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -85,6 +88,21 @@ public class ProjectService {
     public void deleteProject(long id) {
         projectRepository.deleteById(id);
         return;
+    }
+
+    public Page<Project> getAllProjects(int page) {
+        Pageable pageable = PageRequest.of(page, 20);
+        return projectRepository.findAll(pageable);
+    }
+
+    // 사용자가 회사를 검색하고 프로젝트를 찾음 -> 회사를 문자열로 검색 -> 회사를 찾음 -> 해당 서비스 호출
+    public Page<Project> getCompanyProjects(long companyId, int page) {
+        Company company = companyRepository.findById(companyId).orElse(null);
+        if (company == null) {
+            return null;
+        }
+        Pageable pageable = PageRequest.of(page, 20);
+        return projectRepository.findAllByCompanyName(company.getName(), pageable);
     }
 
 }
