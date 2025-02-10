@@ -18,7 +18,6 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
-    @Transactional
     public void saveCompany(CompanyRequestDto requestDto) {
         Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
         if (company == null) {
@@ -37,7 +36,10 @@ public class CompanyService {
 
     public void deleteCompany(long companyId) {
         Company company = companyRepository.findById(companyId).orElse(null);
-
+        if (company != null) {
+            company.updateActive(false);
+            companyRepository.save(company);
+        }
     }
 
     public Company getCompany(String companyName) {

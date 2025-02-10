@@ -32,6 +32,8 @@ public class Project {
 
     private Date endDate; // 종료일
 
+    // TODO: created_at, updated_at 추가하기
+
     public void updateName(String name) {
         this.name = name;
     }

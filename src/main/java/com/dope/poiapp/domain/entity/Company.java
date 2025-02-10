@@ -32,6 +32,8 @@ public class Company {
     private List<Project> projects;
 
     private boolean isActive;
+    
+    // TODO: created_at, updated_at 추가하기
 
     public void updateName(String name) {
         this.name = name;
