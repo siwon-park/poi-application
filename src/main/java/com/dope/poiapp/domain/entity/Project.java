@@ -2,7 +2,10 @@ package com.dope.poiapp.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -32,7 +35,13 @@ public class Project {
 
     private Date endDate; // 종료일
 
-    // TODO: created_at, updated_at 추가하기
+    private boolean hasOutSourcing; // 하도급 유무
+
+    @CreatedDate
+    private LocalDateTime createdAt; // 생성일
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt; // 업데이트 일
 
     public void updateName(String name) {
         this.name = name;

@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -32,8 +35,12 @@ public class Company {
     private List<Project> projects;
 
     private boolean isActive;
-    
-    // TODO: created_at, updated_at 추가하기
+
+    @CreatedDate
+    private LocalDateTime createdAt; // 생성일
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt; // 업데이트 일
 
     public void updateName(String name) {
         this.name = name;
