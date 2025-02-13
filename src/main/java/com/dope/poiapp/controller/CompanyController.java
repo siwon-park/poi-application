@@ -17,18 +17,26 @@ public class CompanyController {
 
     private final CompanyService companyService;
     private final ProjectService projectService;
-    
-    // TODO: Company CRUD 구현 필요
+
+    @GetMapping("/company/{id}")
+    public String getCompany(@PathVariable long id) {
+        return companyService.getCompany(id).toString();
+    }
+
+    // TODO: 회사의 생성과 업데이트를 명확하게 구분하기
     @PostMapping("/company")
-    public void createOrUpdateCompany(@RequestBody CompanyRequestDto requestDto) {
-        // TODO: PutMapping 없이 update를 PostMapping으로 처리해도 괜찮을까?
+    public void createCompany(@RequestBody CompanyRequestDto requestDto) {
         companyService.saveCompany(requestDto);
     }
 
-    @DeleteMapping("/company")
-    public void deleteCompany(@RequestBody CompanyRequestDto requestDto) {
-        // TODO: id를 요청으로 받아서 삭제함 -> 굳이 requestDTO를 받을 필요가 있나?
-        // companyService.deleteCompany(requestDto.getCompanyId);
+    @PutMapping("/company")
+    public void updateCompany(@RequestBody CompanyRequestDto requestDto) {
+        companyService.saveCompany(requestDto);
+    }
+
+    @DeleteMapping("/company/{id}")
+    public void deleteCompany(@PathVariable long id) {
+         companyService.deleteCompany(id);
     }
 
     @GetMapping("/company/list")
@@ -40,5 +48,7 @@ public class CompanyController {
     public Page<Project> listCompanyProjects(@PathVariable long id, @RequestParam(value = "page", defaultValue = "0") int page) {
         return projectService.getCompanyProjects(id, page);
     }
+
+    // TODO: 회사명 검색해서 회사 리스트 가져오는 메서드 구현 필요
 
 }

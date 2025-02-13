@@ -42,6 +42,10 @@ public class CompanyService {
         }
     }
 
+    public Company getCompany(long companyId) {
+        return companyRepository.findById(companyId).orElse(null);
+    }
+
     public Company getCompany(String companyName) {
         return companyRepository.findByName(companyName).orElse(null);
     }
