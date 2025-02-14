@@ -19,6 +19,7 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    // TODO: 복합 프로젝트(프로젝트 이름, 프로젝트명이 여러 개인 경우?)
     private String name; // 프로젝트 이름
 
     private String description; // 프로젝트 내용
