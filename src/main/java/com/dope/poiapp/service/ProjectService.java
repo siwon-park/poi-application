@@ -1,6 +1,6 @@
 package com.dope.poiapp.service;
 
-import com.dope.poiapp.domain.dto.ProjectRequestDto;
+import com.dope.poiapp.domain.dto.request.ProjectRequestDto;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.repository.CompanyRepository;

@@ -1,4 +1,4 @@
-package com.dope.poiapp.domain.dto;
+package com.dope.poiapp.domain.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;

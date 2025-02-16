@@ -1,6 +1,6 @@
 package com.dope.poiapp.service;
 
-import com.dope.poiapp.domain.dto.CompanyRequestDto;
+import com.dope.poiapp.domain.dto.request.CompanyRequestDto;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

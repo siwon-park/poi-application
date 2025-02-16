@@ -1,6 +1,6 @@
 package com.dope.poiapp.controller;
 
-import com.dope.poiapp.domain.dto.ProjectRequestDto;
+import com.dope.poiapp.domain.dto.request.ProjectRequestDto;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.service.ProjectService;
 import lombok.RequiredArgsConstructor;

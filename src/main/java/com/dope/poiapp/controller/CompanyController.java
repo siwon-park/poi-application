@@ -1,12 +1,14 @@
 package com.dope.poiapp.controller;
 
-import com.dope.poiapp.domain.dto.CompanyRequestDto;
+import com.dope.poiapp.domain.dto.request.CompanyRequestDto;
+import com.dope.poiapp.domain.dto.response.CompanyResponse;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.service.CompanyService;
 import com.dope.poiapp.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,8 +21,8 @@ public class CompanyController {
     private final ProjectService projectService;
 
     @GetMapping("/company/{id}")
-    public String getCompany(@PathVariable long id) {
-        return companyService.getCompany(id).toString();
+    public ResponseEntity<Company> getCompany(@PathVariable long id) {
+        return ResponseEntity.ok().body(companyService.getCompany(id));
     }
 
     // TODO: 회사의 생성과 업데이트를 명확하게 구분하기
