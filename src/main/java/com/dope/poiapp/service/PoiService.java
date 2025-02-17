@@ -3,15 +3,20 @@ package com.dope.poiapp.service;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.apache.poi.xwpf.usermodel.*;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -19,25 +24,28 @@ import java.util.List;
 public class PoiService {
 
     @Value("${file.template.path}")
-    private String templateFilePath;
+    private String wordTemplateFilePath;
+
+    @Value("src/main/resources/static/files/ExcelTemplate.xlsx")
+    private String excelTemplateFilePath;
 
     private final ProjectRepository projectRepository;
 
     /**
      * TODO: project나 company 객체를 사용하지 말고 DTO 사용으로 변경 필요 (25-02-01)
      * */
-    public byte[] createWord(long pid) throws FileNotFoundException, IOException {
-        FileInputStream fis = new FileInputStream(templateFilePath); // "C:\\Users\\zow77\\Downloads\\WordTemplate.docx"
+    public byte[] generateWordDocx(long pid) throws IOException {
+        FileInputStream fis = new FileInputStream(wordTemplateFilePath); // "C:\\Users\\zow77\\Downloads\\WordTemplate.docx"
         XWPFDocument document = new XWPFDocument(fis);
         List<XWPFParagraph> paragraphs = document.getParagraphs(); // 문서 패러그래프의 정보
         Project project = projectRepository.findById(pid).orElseThrow();
         String company = project.getCompany().getName();
-        Date finishDate = project.getEndDate();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일");
-        String finDate = sdf.format(finishDate);
+        LocalDateTime finishDate = project.getEndDate();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String finDate = dtf.format(finishDate);
 
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMdd");
-        String newFileName = "개발완료확인서_" + company + "_" + sdf2.format(finishDate) + ".docx";
+        DateTimeFormatter dtf2 =  DateTimeFormatter.ofPattern("yyMMdd");
+        String newFileName = "개발완료확인서_" + company + "_" + dtf2.format(finishDate) + ".docx";
 
         XWPFRun run;
         run = paragraphs.get(19).getRuns().get(0); // 19번째 패러그래프의 런 정보의 첫번째 값부터 가져옴; 날짜
@@ -79,11 +87,11 @@ public class PoiService {
                         cell.getParagraphs().get(0).getRuns().get(0).setFontFamily("맑은 고딕");
                     }
                     if (cellNo == 7) { // 개발 기간
-                        cell.setText(sdf.format(project.getStartDate()) + " ~ " + sdf.format(project.getEndDate()));
+                        cell.setText(dtf.format(project.getStartDate()) + " ~ " + dtf.format(project.getEndDate()));
                         cell.getParagraphs().get(0).getRuns().get(0).setFontFamily("맑은 고딕");
                     }
                     if (cellNo == 9) { // 개발 완료 확인 일자
-                        cell.setText(sdf.format(project.getEndDate()));
+                        cell.setText(dtf.format(project.getEndDate()));
                         cell.getParagraphs().get(0).getRuns().get(0).setFontFamily("맑은 고딕");
                     }
                     if (cellNo == 14) { // 개발 내역
@@ -126,4 +134,37 @@ public class PoiService {
         document.close();
         return fos.toByteArray();
     }
+
+    public byte[] generateExcel(long pid) throws IOException {
+        Project project = projectRepository.findById(pid).orElseThrow(null);
+        if (project == null) {
+            return null;
+        }
+        FileInputStream fis = new FileInputStream(excelTemplateFilePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+        Row row = sheet.getRow(4); // getRow해서 가져오는 게 행이고
+        // getCell 해서 가져오는 게 열임
+        row.getCell(3).setCellValue(project.getCompany().getName()); // 고객사명
+        row.getCell(4).setCellValue(project.getName()); // 프로젝트명
+        row.getCell(5).setCellValue(project.getDescription()); // 프로젝트 내용
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        LocalDateTime startDate = project.getStartDate();
+        LocalDateTime endDate = project.getEndDate();
+        row.getCell(6).setCellValue(dtf.format(startDate) + " ~ " + dtf.format(endDate));
+        // TODO: 프로젝트에 있는 데이터를 적절히 뽑아서 엑셀화 필요 -> 현재는 다운로드까지만 테스트함
+        /*
+        *             Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(data.get("name").toString()); // A열
+            row.createCell(1).setCellValue((Integer) data.get("age"));   // B열
+        *
+        *
+        * */
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        workbook.write(fos);
+        workbook.close();
+        return fos.toByteArray();
+    }
+
+
 }

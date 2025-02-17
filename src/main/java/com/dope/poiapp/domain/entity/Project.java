@@ -32,9 +32,11 @@ public class Project {
 
     private String customer; // 고객 담당자
 
-    private Date startDate; // 프로젝트 시작일
+    private LocalDateTime startDate; // 프로젝트 시작일
 
-    private Date endDate; // 종료일
+    private LocalDateTime endDate; // 종료일
+
+    // TODO: 프로젝트의 공수 추가 필요 (Double)
 
     private boolean hasOutSourcing; // 하도급 유무
 
@@ -64,11 +66,11 @@ public class Project {
         this.customer = customer;
     }
 
-    public void updateStartDate(Date startDate) {
+    public void updateStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public void updateEndDate(Date endDate) {
+    public void updateEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 

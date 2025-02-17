@@ -2,6 +2,7 @@ package com.dope.poiapp.controller;
 
 import com.dope.poiapp.service.PoiService;
 import lombok.RequiredArgsConstructor;
+import org.docx4j.wml.R;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +24,28 @@ public class PoiController {
     // 200: 성공, 401: Unauthorized (인증 정보 없음), 403: Forbidden (권한 없음), 404: Not Found
     @GetMapping("/download/word/{pid}")
     public ResponseEntity<byte[]> downloadWord(@PathVariable long pid) throws Exception {
-        byte[] wordContent = poiService.createWord(pid);
+        byte[] wordContent = poiService.generateWordDocx(pid);
 
         HttpHeaders headers = new HttpHeaders();
+        // TODO: 파일명 생성 로직 수정
         headers.setContentDispositionFormData("attachment", "sample.docx");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(wordContent);
+    }
+
+    @GetMapping("/download/excel/{pid}")
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable long pid) throws Exception {
+        byte[] excelContent = poiService.generateExcel(pid);
+        HttpHeaders headers = new HttpHeaders();
+        // TODO: 파일명 생성 로직 수정
+        headers.setContentDispositionFormData("attachment", "sample.xlsx");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelContent);
     }
 
     /*
