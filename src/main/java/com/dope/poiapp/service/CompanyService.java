@@ -3,12 +3,14 @@ package com.dope.poiapp.service;
 import com.dope.poiapp.domain.dto.request.CompanyRequestDto;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.repository.CompanyRepository;
+import com.dope.poiapp.utils.CompanyResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,21 +19,25 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
-    public void saveCompany(CompanyRequestDto requestDto) {
+    public String createCompany(CompanyRequestDto requestDto) {
         Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
         if (company == null) {
             company = Company.builder()
                     .name(requestDto.getCompanyName())
                     .address(requestDto.getCompanyAddress())
                     .isActive(true)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .aliasNames(List.of(requestDto.getCompanyName()))
                     .build();
-        } else {
-            company.updateName(requestDto.getCompanyName());
-            company.updateAddress(requestDto.getCompanyAddress());
-            company.updateActive(true);
+            companyRepository.save(company);
+            return CompanyResult.CREATE_SUCCESS.getMessage();
+        } else { // 회사가 있으면 생성 실패 -> already exists
+            return CompanyResult.ALREADY_EXIST.getMessage();
         }
-        companyRepository.save(company);
     }
+    
+    // TODO: updateCompany 만들어야 함
 
     public void deleteCompany(long companyId) {
         Company company = companyRepository.findById(companyId).orElse(null);

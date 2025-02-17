@@ -25,15 +25,15 @@ public class CompanyController {
         return ResponseEntity.ok().body(companyService.getCompany(id));
     }
 
-    // TODO: 회사의 생성과 업데이트를 명확하게 구분하기
-    @PostMapping("/company")
-    public void createCompany(@RequestBody CompanyRequestDto requestDto) {
-        companyService.saveCompany(requestDto);
+    @PostMapping("/company/create")
+    public ResponseEntity<String> createCompany(@RequestBody CompanyRequestDto requestDto) {
+        String result = companyService.createCompany(requestDto);
+        return ResponseEntity.ok().body(result); // TODO: 무조건 OK를 뱉는 건 아닌듯...
     }
 
-    @PutMapping("/company")
+    @PutMapping("/company/update")
     public void updateCompany(@RequestBody CompanyRequestDto requestDto) {
-        companyService.saveCompany(requestDto);
+//        companyService.saveCompany(requestDto);
     }
 
     @DeleteMapping("/company/{id}")

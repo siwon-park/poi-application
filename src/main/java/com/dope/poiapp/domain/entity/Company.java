@@ -30,6 +30,7 @@ public class Company {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "company_alias_names", joinColumns = @JoinColumn(name="entity_id"))
     private List<String> aliasNames; // 'Basic' attribute type should not be a container -> JPA에서는 기본형밖에 지원 안하기 때문에 콜렉션을 쓰려면 어노테이션들이 필요
+    // 관계사, 자회사 등을 포함하기 위해 aliasNames 별칭 계정명 사용
 
     @OneToMany
     private List<Project> projects;
