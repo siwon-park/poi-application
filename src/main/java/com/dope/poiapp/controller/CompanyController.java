@@ -28,12 +28,15 @@ public class CompanyController {
     @PostMapping("/company/create")
     public ResponseEntity<String> createCompany(@RequestBody CompanyRequestDto requestDto) {
         String result = companyService.createCompany(requestDto);
-        return ResponseEntity.ok().body(result); // TODO: 무조건 OK를 뱉는 건 아닌듯...
+        if ("success".equals(result)) {
+            return ResponseEntity.ok().body(result);
+        }
+        return ResponseEntity.badRequest().body(result);
     }
 
     @PutMapping("/company/update")
     public void updateCompany(@RequestBody CompanyRequestDto requestDto) {
-//        companyService.saveCompany(requestDto);
+
     }
 
     @DeleteMapping("/company/{id}")
@@ -41,6 +44,7 @@ public class CompanyController {
          companyService.deleteCompany(id);
     }
 
+    // TODO: ResponseEntity를 사용해서 페이지네이션 처리가 가능한가?
     @GetMapping("/company/list")
     public Page<Company> list(@RequestParam(value = "page", defaultValue = "0") int page) {
         return companyService.getAllCompanies(page);

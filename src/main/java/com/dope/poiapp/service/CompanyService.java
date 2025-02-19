@@ -1,6 +1,7 @@
 package com.dope.poiapp.service;
 
 import com.dope.poiapp.domain.dto.request.CompanyRequestDto;
+import com.dope.poiapp.domain.dto.response.CompanyResponse;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.repository.CompanyRepository;
 import com.dope.poiapp.utils.CompanyResult;
@@ -20,15 +21,15 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
 
     public String createCompany(CompanyRequestDto requestDto) {
-        Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
+        Company company = companyRepository.findByName(requestDto.name()).orElse(null);
         if (company == null) {
             company = Company.builder()
-                    .name(requestDto.getCompanyName())
-                    .address(requestDto.getCompanyAddress())
+                    .name(requestDto.name())
+                    .address(requestDto.address())
                     .isActive(true)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
-                    .aliasNames(List.of(requestDto.getCompanyName()))
+                    .aliasNames(List.of(requestDto.name()))
                     .build();
             companyRepository.save(company);
             return CompanyResult.CREATE_SUCCESS.getMessage();
@@ -36,8 +37,19 @@ public class CompanyService {
             return CompanyResult.ALREADY_EXIST.getMessage();
         }
     }
-    
-    // TODO: updateCompany 만들어야 함
+
+    public CompanyResponse updateCompany(CompanyRequestDto requestDto) {
+        Company company = companyRepository.findById(requestDto.id()).orElse(null);
+        if (company != null) {
+            company.updateName(requestDto.name());
+            company.updateAddress(requestDto.address());
+            company.updateActive(true);
+            companyRepository.save(company);
+            // TODO: companyResponse 객체 생성해서 리턴 -> CompanyResponse 클래스 수정 필요
+            return null;
+        }
+        return null;
+    }
 
     public void deleteCompany(long companyId) {
         Company company = companyRepository.findById(companyId).orElse(null);

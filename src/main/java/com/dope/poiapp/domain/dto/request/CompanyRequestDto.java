@@ -1,13 +1,15 @@
 package com.dope.poiapp.domain.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@Getter
-@Setter
-@Builder
-public class CompanyRequestDto {
-    String companyName;
-    String companyAddress;
+public record CompanyRequestDto (
+    long id,
+    String name,
+    String address,
+    List<String> aliasNames,
+    boolean isActive,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
+){
 }
