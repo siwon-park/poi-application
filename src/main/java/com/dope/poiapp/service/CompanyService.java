@@ -45,18 +45,19 @@ public class CompanyService {
             company.updateAddress(requestDto.address());
             company.updateActive(true);
             companyRepository.save(company);
-            // TODO: companyResponse 객체 생성해서 리턴 -> CompanyResponse 클래스 수정 필요
-            return null;
+            return new CompanyResponse(company, CompanyResult.UPDATE_SUCCESS.getMessage());
         }
-        return null;
+        return new CompanyResponse(null, CompanyResult.NOT_FOUND.getMessage());
     }
 
-    public void deleteCompany(long companyId) {
+    public CompanyResponse deleteCompany(long companyId) {
         Company company = companyRepository.findById(companyId).orElse(null);
         if (company != null) {
             company.updateActive(false);
             companyRepository.save(company);
+            return new CompanyResponse(company, CompanyResult.DELETE_SUCCESS.getMessage());
         }
+        return new CompanyResponse(null, CompanyResult.NOT_FOUND.getMessage());
     }
 
     public Company getCompany(long companyId) {

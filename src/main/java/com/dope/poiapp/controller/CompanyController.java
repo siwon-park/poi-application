@@ -6,6 +6,7 @@ import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.service.CompanyService;
 import com.dope.poiapp.service.ProjectService;
+import com.dope.poiapp.utils.CompanyResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +36,21 @@ public class CompanyController {
     }
 
     @PutMapping("/company/update")
-    public void updateCompany(@RequestBody CompanyRequestDto requestDto) {
-
+    public ResponseEntity<CompanyResponse> updateCompany(@RequestBody CompanyRequestDto requestDto) {
+        CompanyResponse companyResponse = companyService.updateCompany(requestDto);
+        if (companyResponse.company() == null) {
+            return ResponseEntity.badRequest().body(companyResponse);
+        }
+        return ResponseEntity.ok().body(companyResponse);
     }
 
     @DeleteMapping("/company/{id}")
-    public void deleteCompany(@PathVariable long id) {
-         companyService.deleteCompany(id);
+    public ResponseEntity<CompanyResponse> deleteCompany(@PathVariable long id) {
+         CompanyResponse companyResponse = companyService.deleteCompany(id);
+         if (CompanyResult.DELETE_SUCCESS.equals(companyResponse.message())) {
+             return ResponseEntity.ok().body(companyResponse);
+         }
+         return ResponseEntity.badRequest().body(companyResponse);
     }
 
     // TODO: ResponseEntity를 사용해서 페이지네이션 처리가 가능한가?
