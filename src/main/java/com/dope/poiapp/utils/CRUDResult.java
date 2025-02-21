@@ -3,8 +3,9 @@ package com.dope.poiapp.utils;
 import lombok.Getter;
 
 @Getter
-public enum CompanyResult {
+public enum CRUDResult {
 
+    SUCCESS("success"),
     CREATE_SUCCESS("create success"),
     UPDATE_SUCCESS("update success"),
     DELETE_SUCCESS("delete success"),
@@ -14,7 +15,7 @@ public enum CompanyResult {
 
     private final String message;
 
-    CompanyResult(String message) {
+    CRUDResult(String message) {
         this.message = message;
     }
 

@@ -1,10 +1,12 @@
 package com.dope.poiapp.service;
 
 import com.dope.poiapp.domain.dto.request.ProjectRequestDto;
+import com.dope.poiapp.domain.dto.response.ProjectResponse;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.repository.CompanyRepository;
 import com.dope.poiapp.repository.ProjectRepository;
+import com.dope.poiapp.utils.CRUDResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,43 +47,41 @@ public class ProjectService {
         return projects;
     }
 
-    public void createProject(ProjectRequestDto requestDto) {
+    public ProjectResponse createProject(ProjectRequestDto requestDto) {
         Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
         if (company == null) {
-            // 회사가 없으므로 프로젝트를 등록 못함
-            return;
+            return new ProjectResponse(null, "Company not found");
         }
         // 신규 프로젝트
         Project project = Project.builder()
-                .name(requestDto.getProjectName())
-                .projectManager(requestDto.getProjectManager())
+                .name(requestDto.getName())
+                .projectManager(requestDto.getPM())
                 .company(company)
                 .startDate(requestDto.getStartDate())
                 .endDate(requestDto.getEndDate())
                 .build();
         projectRepository.save(project);
-        return;
+        return new ProjectResponse(project, CRUDResult.CREATE_SUCCESS.getMessage());
     }
 
-    // TODO: requestDTO에 id까지 담아서 주는 게 맞을까?
-    public void updateProject(long id, ProjectRequestDto requestDto) {
-        Project project = projectRepository.findById(id).orElse(null);
+    public ProjectResponse updateProject(ProjectRequestDto requestDto) {
+        Project project = projectRepository.findById(requestDto.getId()).orElse(null);
         if (project == null) { // 프로젝트가 없으므로 수정 못함
-            return;
+            return new ProjectResponse(null, "Project not found");
         }
         Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
         if (company == null) { // 회사가 없으므로 수정 못함
-            return;
+            return new ProjectResponse(null, "Company not found");
         }
-        project.updateName(requestDto.getProjectName());
-        project.updateProjectManager(requestDto.getProjectManager());
-        project.updateDescription(requestDto.getProjectDescription());
+        project.updateName(requestDto.getName());
+        project.updateProjectManager(requestDto.getPM());
+        project.updateDescription(requestDto.getDescription());
         project.updateCompany(company);
-        project.updateCustomer(requestDto.getProjectCustomer());
+        project.updateCustomer(requestDto.getCustomer());
         project.updateStartDate(requestDto.getStartDate());
         project.updateEndDate(requestDto.getEndDate());
         projectRepository.save(project);
-        return;
+        return new ProjectResponse(project, CRUDResult.UPDATE_SUCCESS.getMessage());
     }
 
     // 프로젝트는 hard delete

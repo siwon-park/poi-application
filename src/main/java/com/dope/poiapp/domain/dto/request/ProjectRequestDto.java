@@ -12,10 +12,11 @@ import java.util.Date;
 @Setter
 @Builder
 public class ProjectRequestDto {
-    private String projectName;
-    private String projectManager;
-    private String projectDescription;
-    private String projectCustomer;
+    private long id;
+    private String name;
+    private String PM;
+    private String description;
+    private String customer;
     private String companyName;
     private LocalDateTime startDate;
     private LocalDateTime endDate;

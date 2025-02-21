@@ -6,7 +6,7 @@ import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.service.CompanyService;
 import com.dope.poiapp.service.ProjectService;
-import com.dope.poiapp.utils.CompanyResult;
+import com.dope.poiapp.utils.CRUDResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +47,7 @@ public class CompanyController {
     @DeleteMapping("/company/{id}")
     public ResponseEntity<CompanyResponse> deleteCompany(@PathVariable long id) {
          CompanyResponse companyResponse = companyService.deleteCompany(id);
-         if (CompanyResult.DELETE_SUCCESS.equals(companyResponse.message())) {
+         if (CRUDResult.DELETE_SUCCESS.equals(companyResponse.message())) {
              return ResponseEntity.ok().body(companyResponse);
          }
          return ResponseEntity.badRequest().body(companyResponse);

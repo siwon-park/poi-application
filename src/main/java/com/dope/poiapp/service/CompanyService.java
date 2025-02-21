@@ -4,7 +4,7 @@ import com.dope.poiapp.domain.dto.request.CompanyRequestDto;
 import com.dope.poiapp.domain.dto.response.CompanyResponse;
 import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.repository.CompanyRepository;
-import com.dope.poiapp.utils.CompanyResult;
+import com.dope.poiapp.utils.CRUDResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,9 +32,9 @@ public class CompanyService {
                     .aliasNames(List.of(requestDto.name()))
                     .build();
             companyRepository.save(company);
-            return CompanyResult.CREATE_SUCCESS.getMessage();
+            return CRUDResult.CREATE_SUCCESS.getMessage();
         } else { // 회사가 있으면 생성 실패 -> already exists
-            return CompanyResult.ALREADY_EXIST.getMessage();
+            return CRUDResult.ALREADY_EXIST.getMessage();
         }
     }
 
@@ -45,9 +45,9 @@ public class CompanyService {
             company.updateAddress(requestDto.address());
             company.updateActive(true);
             companyRepository.save(company);
-            return new CompanyResponse(company, CompanyResult.UPDATE_SUCCESS.getMessage());
+            return new CompanyResponse(company, CRUDResult.UPDATE_SUCCESS.getMessage());
         }
-        return new CompanyResponse(null, CompanyResult.NOT_FOUND.getMessage());
+        return new CompanyResponse(null, CRUDResult.NOT_FOUND.getMessage());
     }
 
     public CompanyResponse deleteCompany(long companyId) {
@@ -55,9 +55,9 @@ public class CompanyService {
         if (company != null) {
             company.updateActive(false);
             companyRepository.save(company);
-            return new CompanyResponse(company, CompanyResult.DELETE_SUCCESS.getMessage());
+            return new CompanyResponse(company, CRUDResult.DELETE_SUCCESS.getMessage());
         }
-        return new CompanyResponse(null, CompanyResult.NOT_FOUND.getMessage());
+        return new CompanyResponse(null, CRUDResult.NOT_FOUND.getMessage());
     }
 
     public Company getCompany(long companyId) {
