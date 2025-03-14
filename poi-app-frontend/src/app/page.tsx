@@ -1,6 +1,45 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Pagination from '@/components/Pagination';
 import Image from "next/image";
 
+interface Item {
+  id: number;
+  title: string;
+  description: string;
+}
+
 export default function Home() {
+  const [items, setItems] = useState<Item[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const fetchItems = async (page: number) => {
+    try {
+      setLoading(true);
+      // API 엔드포인트를 실제 백엔드 URL로 변경해주세요
+      const response = await fetch(`/api/items?page=${page}&limit=10`);
+      const data = await response.json();
+      
+      setItems(data.items);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      console.error('데이터를 불러오는 중 오류가 발생했습니다:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchItems(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -48,6 +87,34 @@ export default function Home() {
             Read our docs
           </a>
         </div>
+
+        <h1 className="text-2xl font-bold mb-4">아이템 목록</h1>
+        
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            로딩 중...
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-4">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <h2 className="text-xl font-semibold">{item.title}</h2>
+                  <p className="text-gray-600">{item.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </>
+        )}
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
