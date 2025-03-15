@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from 'next/link';
+import Image from 'next/image';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,9 +27,40 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        {children}
+        {/* 헤더 */}
+        <header className="bg-black text-white py-6">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center">
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/images/header_logo.png"
+                  alt="Poi App Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
+                <span className="text-[32px] font-bold font-[family-name:var(--font-geist-sans)] px-1">
+                  Poi App
+                </span>
+              </Link>
+              <nav className="space-x-4">
+                {/* TODO: 회사 생성 메뉴를 만들기 */}
+                {/* TODO2: 프로젝트 목록 메뉴 만들고 -> 프로젝트 리스트 페이지 렌더링 필요 (중요도 낮음) */}
+                
+                <Link href="/" className="hover:text-gray-300 transition-colors">홈</Link>
+                <Link href="/map" className="hover:text-gray-300 transition-colors">지도</Link>
+                <Link href="/favorites" className="hover:text-gray-300 transition-colors">즐겨찾기</Link>
+              </nav>
+            </div>
+          </div>
+        </header>
+
+        {/* 메인 컨텐츠 */}
+        <div className="flex-1">
+          {children}
+        </div>
       </body>
     </html>
   );
