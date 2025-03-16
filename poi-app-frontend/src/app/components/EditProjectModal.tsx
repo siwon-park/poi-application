@@ -1,23 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Project } from '@/types/project';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
 
-interface RegisterProjectModalProps {
+interface EditProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: ProjectFormData) => void;
-}
-
-interface ProjectFormData {
-  title: string;
-  description: string;
-  status: '진행중' | '완료' | '계획중';
-  startDate: string;
-  endDate?: string;
-  projectManager: string;
-  hasSubcontractor: boolean;
-  subcontractor?: string;
-  clientManager: string;
+  onSubmit: (data: Omit<Project, 'id'>) => void;
+  initialData: Project;
 }
 
 // 임시 데이터 (실제로는 API에서 가져와야 함)
@@ -35,15 +27,16 @@ const SUBCONTRACTORS = [
   '하도급사 D',
 ];
 
-export default function RegisterProjectModal({
+const EditProjectModal: React.FC<EditProjectModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-}: RegisterProjectModalProps) {
-  const [formData, setFormData] = useState<ProjectFormData>({
+  initialData,
+}) => {
+  const [formData, setFormData] = useState<Omit<Project, 'id'>>({
     title: '',
     description: '',
-    status: '계획중',
+    status: '',
     startDate: '',
     endDate: '',
     projectManager: '',
@@ -51,6 +44,13 @@ export default function RegisterProjectModal({
     subcontractor: '',
     clientManager: '',
   });
+
+  useEffect(() => {
+    if (initialData) {
+      const { id, ...rest } = initialData;
+      setFormData(rest);
+    }
+  }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,9 +86,9 @@ export default function RegisterProjectModal({
       <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
         <div className="flex justify-between items-start p-8 border-b">
           <div>
-            <h2 className="text-2xl font-bold mb-2">프로젝트 등록</h2>
+            <h2 className="text-2xl font-bold mb-2">프로젝트 수정</h2>
             <p className="text-gray-600">
-              새로운 프로젝트 정보를 입력해주세요.
+              프로젝트 정보를 수정해주세요.
             </p>
           </div>
           <button
@@ -284,11 +284,13 @@ export default function RegisterProjectModal({
               type="submit"
               className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
             >
-              등록하기
+              수정하기
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-} 
+};
+
+export default EditProjectModal; 

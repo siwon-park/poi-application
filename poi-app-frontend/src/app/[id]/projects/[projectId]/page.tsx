@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import EditProjectModal from '../../../components/EditProjectModal';
+import DeleteProjectModal from '../../../components/DeleteProjectModal';
 
 interface Project {
   id: string;
@@ -11,6 +13,10 @@ interface Project {
   status: '진행중' | '완료' | '계획중';
   startDate: string;
   endDate?: string;
+  projectManager: string;
+  hasSubcontractor: boolean;
+  subcontractor?: string;
+  clientManager: string;
 }
 
 export default function ProjectDetailPage({
@@ -21,6 +27,8 @@ export default function ProjectDetailPage({
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     // TODO: API에서 실제 프로젝트 데이터 가져오기
@@ -34,6 +42,10 @@ export default function ProjectDetailPage({
           status: '진행중',
           startDate: '2024-01-01',
           endDate: '2024-12-31',
+          projectManager: '김철수',
+          hasSubcontractor: true,
+          subcontractor: '하도급사 A',
+          clientManager: '이영희',
         };
 
         setProject(dummyProject);
@@ -47,6 +59,27 @@ export default function ProjectDetailPage({
 
     fetchProject();
   }, [params.projectId]);
+
+  const handleEdit = async (data: Omit<Project, 'id'>) => {
+    try {
+      // TODO: API 호출로 프로젝트 정보 업데이트
+      setProject({ ...data, id: project!.id });
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error('프로젝트 수정 중 오류 발생:', error);
+      alert('프로젝트 수정에 실패했습니다.');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      // TODO: API 호출로 프로젝트 삭제
+      router.push(`/${params.id}`);  // 회사 상세 페이지로 이동
+    } catch (error) {
+      console.error('프로젝트 삭제 중 오류 발생:', error);
+      alert('프로젝트 삭제에 실패했습니다.');
+    }
+  };
 
   const getStatusColor = (status: Project['status']) => {
     switch (status) {
@@ -127,7 +160,18 @@ export default function ProjectDetailPage({
             <p className="text-gray-600 whitespace-pre-line">{project.description}</p>
           </div>
 
-          <div className="flex gap-8">
+          <div className="grid grid-cols-2 gap-8">
+            <div>
+              <h2 className="text-lg font-semibold mb-2">PM</h2>
+              <p className="text-gray-600">{project.projectManager}</p>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold mb-2">고객사 담당자</h2>
+              <p className="text-gray-600">{project.clientManager}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-8">
             <div>
               <h2 className="text-lg font-semibold mb-2">시작일</h2>
               <p className="text-gray-600">{project.startDate}</p>
@@ -139,6 +183,13 @@ export default function ProjectDetailPage({
               </div>
             )}
           </div>
+
+          {project.hasSubcontractor && (
+            <div>
+              <h2 className="text-lg font-semibold mb-2">하도급사</h2>
+              <p className="text-gray-600">{project.subcontractor}</p>
+            </div>
+          )}
 
           <div className="flex justify-between gap-3 pt-6 mt-6 border-t">
             <div className="flex gap-3">
@@ -154,7 +205,7 @@ export default function ProjectDetailPage({
                   alt="Excel"
                   className="w-5 h-5"
                 />
-                엑셀 출력
+                엑셀 다운
               </button>
               <button
                 onClick={() => {
@@ -168,24 +219,18 @@ export default function ProjectDetailPage({
                   alt="Word"
                   className="w-5 h-5"
                 />
-                워드 출력
+                워드 다운
               </button>
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => {
-                  // TODO: 프로젝트 수정 기능 구현
-                  alert('프로젝트 수정 기능은 아직 구현되지 않았습니다.');
-                }}
+                onClick={() => setIsEditModalOpen(true)}
                 className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
               >
                 수정
               </button>
               <button
-                onClick={() => {
-                  // TODO: 프로젝트 삭제 기능 구현
-                  alert('프로젝트 삭제 기능은 아직 구현되지 않았습니다.');
-                }}
+                onClick={() => setIsDeleteModalOpen(true)}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 삭제
@@ -194,6 +239,20 @@ export default function ProjectDetailPage({
           </div>
         </div>
       </div>
+
+      <EditProjectModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={handleEdit}
+        initialData={project}
+      />
+
+      <DeleteProjectModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        projectTitle={project.title}
+      />
     </div>
   );
 } 
