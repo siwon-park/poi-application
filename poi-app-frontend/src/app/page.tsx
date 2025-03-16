@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import Link from 'next/link';
+import RegisterCompanyModal from './components/RegisterCompanyModal';
 
 interface Item {
   id: number;
@@ -16,6 +17,7 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchItems = async (page: number) => {
     try {
@@ -48,6 +50,7 @@ export default function Home() {
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="space-y-8">
+        {/* 섹션 1: 회사 목록 및 검색 */}
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold font-[family-name:var(--font-geist-sans)]">회사 목록</h2>
           <div className="relative">
@@ -75,6 +78,16 @@ export default function Home() {
               />
             </svg>
           </div>
+        </div>
+
+        {/* 섹션 2: 회사 등록 버튼 */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-bold"
+          >
+            회사 등록
+          </button>
         </div>
         
         {loading ? (
@@ -108,6 +121,11 @@ export default function Home() {
           </>
         )}
       </div>
+
+      <RegisterCompanyModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </main>
   );
 }
