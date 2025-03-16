@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import EditCompanyModal from '../components/EditCompanyModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import ProjectList from '../components/ProjectList';
@@ -107,6 +108,28 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
+      <div className="mb-6">
+        <Link
+          href="/"
+          className="text-gray-600 hover:text-black transition-colors inline-flex items-center gap-2"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          메인으로 돌아가기
+        </Link>
+      </div>
+
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="flex justify-between items-start mb-6">
           <h1 className="text-3xl font-bold">{company.name}</h1>
@@ -155,6 +178,7 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
           totalPages={totalPages}
           onPageChange={handlePageChange}
           onRegisterProject={handleRegisterProject}
+          companyId={params.id}
         />
       </div>
 

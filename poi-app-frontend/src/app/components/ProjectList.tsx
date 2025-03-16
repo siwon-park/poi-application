@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import RegisterProjectModal from './RegisterProjectModal';
 
 interface Project {
@@ -18,6 +19,7 @@ interface ProjectListProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onRegisterProject: (data: Omit<Project, 'id'>) => void;
+  companyId: string;
 }
 
 export default function ProjectList({
@@ -26,8 +28,14 @@ export default function ProjectList({
   totalPages,
   onPageChange,
   onRegisterProject,
+  companyId,
 }: ProjectListProps) {
+  const router = useRouter();
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  const handleProjectClick = (projectId: string) => {
+    router.push(`/${companyId}/projects/${projectId}`);
+  };
 
   const getStatusColor = (status: Project['status']) => {
     switch (status) {
@@ -58,7 +66,8 @@ export default function ProjectList({
         {projects.map((project) => (
           <div
             key={project.id}
-            className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
+            onClick={() => handleProjectClick(project.id)}
+            className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer"
           >
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-xl font-semibold">{project.title}</h3>
