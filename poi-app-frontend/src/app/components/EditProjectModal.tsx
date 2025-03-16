@@ -36,7 +36,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const [formData, setFormData] = useState<Omit<Project, 'id'>>({
     title: '',
     description: '',
-    status: '',
+    status: '진행중' as '진행중' | '완료' | '계획중',
     startDate: '',
     endDate: '',
     projectManager: '',

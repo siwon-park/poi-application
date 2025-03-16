@@ -54,6 +54,7 @@ public class ProjectService {
         // 신규 프로젝트
         Project project = Project.builder()
                 .name(requestDto.getProjectName())
+                .description(requestDto.getProjectDescription())
                 .projectManager(requestDto.getProjectManager())
                 .company(company)
                 .startDate(requestDto.getStartDate())
