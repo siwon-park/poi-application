@@ -28,7 +28,7 @@ public class CompanyService {
                     .isActive(true)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
-                    .aliasNames(List.of(requestDto.getCompanyName()))
+                    .aliasNames(requestDto.getAliasNames())
                     .build();
             companyRepository.save(company);
             return CompanyResult.CREATE_SUCCESS.getMessage();
@@ -59,10 +59,13 @@ public class CompanyService {
         return companyRepository.findAll();
     }
 
-    public Page<Company> getAllCompanies(int page) {
-        Pageable pageable = PageRequest.of(page, 20); // 한 페이지에 20개
+    public Page<Company> getAllCompanies(int page, String search) {
+        Pageable pageable = PageRequest.of(page, 10); // 한 페이지에 20개
+        if (search != null && !search.trim().isEmpty()) { // 검색어가 있는 경우
+            return companyRepository.findByNameContainingOrAddressContaining(search, search, pageable);
+        }
+        // 검색어가 없는 경우
         return companyRepository.findAll(pageable);
     }
-
 
 }

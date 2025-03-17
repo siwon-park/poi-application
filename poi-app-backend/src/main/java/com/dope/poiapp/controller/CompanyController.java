@@ -27,8 +27,10 @@ public class CompanyController {
 
     @PostMapping("/company/create")
     public ResponseEntity<String> createCompany(@RequestBody CompanyRequestDto requestDto) {
+        System.out.println(requestDto.toString());
         String result = companyService.createCompany(requestDto);
-        return ResponseEntity.ok().body(result); // TODO: 무조건 OK를 뱉는 건 아닌듯...
+        // TODO: 무조건 OK를 뱉는 건 아닌듯...
+        return ResponseEntity.ok().body(result);
     }
 
     @PutMapping("/company/update")
@@ -42,8 +44,9 @@ public class CompanyController {
     }
 
     @GetMapping("/company/list")
-    public Page<Company> list(@RequestParam(value = "page", defaultValue = "0") int page) {
-        return companyService.getAllCompanies(page);
+    public Page<Company> list(@RequestParam(value = "page", defaultValue = "0") int page,
+                              @RequestParam(value = "search", required = false) String searchQuery) {
+        return companyService.getAllCompanies(page, searchQuery);
     }
 
     @GetMapping("/company/{id}/list")

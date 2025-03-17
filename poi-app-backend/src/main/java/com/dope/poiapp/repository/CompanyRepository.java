@@ -15,4 +15,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     @NonNull
     Page<Company> findAll(@NonNull Pageable pageable);
+
+    Page<Company> findByNameContainingOrAddressContaining(String companyName, String address, Pageable pageable);
 }
