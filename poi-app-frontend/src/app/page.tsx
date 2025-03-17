@@ -7,8 +7,8 @@ import RegisterCompanyModal from './components/RegisterCompanyModal';
 
 interface Item {
   id: number;
-  title: string;
-  description: string;
+  name: string;
+  address: string;
 }
 
 export default function Home() {
@@ -22,10 +22,14 @@ export default function Home() {
   const fetchItems = async (page: number) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/items?page=${page}&limit=10&search=${searchQuery}`);
+      const response = await fetch(
+        `http://localhost:8080/api/v1/company/list?page=${page - 1}${
+          searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''
+        }`
+      );
       const data = await response.json();
       
-      setItems(data.items);
+      setItems(data.content);
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error('데이터를 불러오는 중 오류가 발생했습니다:', error);
@@ -45,6 +49,10 @@ export default function Home() {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setCurrentPage(1); // 검색 시 첫 페이지로 이동
+  };
+
+  const handleCompanyRegistered = () => {
+    fetchItems(currentPage);
   };
 
   return (
@@ -106,8 +114,8 @@ export default function Home() {
                   <div
                     className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   >
-                    <h3 className="text-xl font-semibold">{item.title}</h3>
-                    <p className="text-gray-600">{item.description}</p>
+                    <h3 className="text-xl font-semibold">{item.name}</h3>
+                    <p className="text-gray-600">{item.address}</p>
                   </div>
                 </Link>
               ))}
@@ -125,6 +133,7 @@ export default function Home() {
       <RegisterCompanyModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCompanyRegistered}
       />
     </main>
   );

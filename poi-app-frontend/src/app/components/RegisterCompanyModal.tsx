@@ -5,6 +5,7 @@ import { useState } from 'react';
 interface RegisterCompanyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit: () => void;
 }
 
 interface CompanyFormData {
@@ -13,7 +14,7 @@ interface CompanyFormData {
   affiliates: string[];
 }
 
-export default function RegisterCompanyModal({ isOpen, onClose }: RegisterCompanyModalProps) {
+export default function RegisterCompanyModal({ isOpen, onClose, onSubmit }: RegisterCompanyModalProps) {
   const [formData, setFormData] = useState<CompanyFormData>({
     name: '',
     address: '',
@@ -21,11 +22,31 @@ export default function RegisterCompanyModal({ isOpen, onClose }: RegisterCompan
   });
   const [affiliateInput, setAffiliateInput] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: API 호출 로직 추가
-    console.log('제출된 데이터:', formData);
-    onClose();
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/company/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyName: formData.name,
+          companyAddress: formData.address,
+          aliasNames: formData.affiliates,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('회사 등록에 실패했습니다.');
+      }
+
+      onClose();
+      onSubmit();
+    } catch (error) {
+      console.error('회사 등록 중 오류 발생:', error);
+      alert('회사 등록에 실패했습니다.');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
