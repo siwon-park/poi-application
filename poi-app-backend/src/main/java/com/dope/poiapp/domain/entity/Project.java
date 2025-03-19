@@ -74,4 +74,8 @@ public class Project {
         this.endDate = endDate;
     }
 
+    public void updateHasOutSourcing(boolean hasOutSourcing) {
+        this.hasOutSourcing = hasOutSourcing;
+    }
+
 }

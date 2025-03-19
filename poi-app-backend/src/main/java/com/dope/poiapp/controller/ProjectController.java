@@ -4,7 +4,9 @@ import com.dope.poiapp.domain.dto.request.ProjectRequestDto;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.docx4j.wml.R;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,13 +22,15 @@ public class ProjectController {
     }
 
     @PostMapping("/project/")
-    public void createProject(@RequestBody ProjectRequestDto requestDto) {
+    public ResponseEntity<String> createProject(@RequestBody ProjectRequestDto requestDto) {
         projectService.createProject(requestDto);
+        return ResponseEntity.ok().body("sucess");
     }
 
     @PutMapping("/project/{id}")
-    public void updateProject(@PathVariable long id, @RequestBody ProjectRequestDto requestDto) {
+    public ResponseEntity<String> updateProject(@PathVariable long id, @RequestBody ProjectRequestDto requestDto) {
         projectService.updateProject(id, requestDto);
+        return ResponseEntity.ok().body("sucess");
     }
 
     @DeleteMapping("/project/{id}")

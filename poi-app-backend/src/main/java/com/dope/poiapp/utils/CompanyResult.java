@@ -3,7 +3,9 @@ package com.dope.poiapp.utils;
 public enum CompanyResult {
 
     CREATE_SUCCESS("create success"),
-    ALREADY_EXIST("already exist"),;
+    ALREADY_EXIST("already exist"),
+    NOT_FOUND("not found"),
+    UPDATE_SUCCESS("update success");
 
     private final String message;
 

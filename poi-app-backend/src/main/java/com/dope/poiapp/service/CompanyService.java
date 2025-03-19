@@ -36,8 +36,23 @@ public class CompanyService {
             return CompanyResult.ALREADY_EXIST.getMessage();
         }
     }
-    
-    // TODO: updateCompany 만들어야 함
+
+    public Company updateCompany(long id, CompanyRequestDto requestDto) {
+        Company company = companyRepository.findById(id).orElse(null);
+//        Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
+        if (company == null) {
+            return null;
+        }
+        System.out.println(requestDto.getCompanyName());
+        System.out.println(requestDto.getCompanyAddress());
+        System.out.println(requestDto.getAliasNames().toString());
+        company.updateName(requestDto.getCompanyName());
+        company.updateAddress(requestDto.getCompanyAddress());
+        company.updateAliasNames(requestDto.getAliasNames());
+        companyRepository.save(company);
+
+        return company;
+    }
 
     public void deleteCompany(long companyId) {
         Company company = companyRepository.findById(companyId).orElse(null);

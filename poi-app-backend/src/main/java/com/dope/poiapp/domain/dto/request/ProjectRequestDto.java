@@ -17,6 +17,7 @@ public class ProjectRequestDto {
     private String projectDescription;
     private String projectCustomer;
     private String companyName;
+    private boolean hasOutSourcing;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 }

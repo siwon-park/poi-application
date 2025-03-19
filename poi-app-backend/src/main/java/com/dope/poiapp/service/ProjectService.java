@@ -59,12 +59,12 @@ public class ProjectService {
                 .company(company)
                 .startDate(requestDto.getStartDate())
                 .endDate(requestDto.getEndDate())
+                .hasOutSourcing(requestDto.isHasOutSourcing())
                 .build();
         projectRepository.save(project);
         return;
     }
 
-    // TODO: requestDTO에 id까지 담아서 주는 게 맞을까?
     public void updateProject(long id, ProjectRequestDto requestDto) {
         Project project = projectRepository.findById(id).orElse(null);
         if (project == null) { // 프로젝트가 없으므로 수정 못함
@@ -81,6 +81,7 @@ public class ProjectService {
         project.updateCustomer(requestDto.getProjectCustomer());
         project.updateStartDate(requestDto.getStartDate());
         project.updateEndDate(requestDto.getEndDate());
+        project.updateHasOutSourcing(requestDto.isHasOutSourcing());
         projectRepository.save(project);
         return;
     }
@@ -92,7 +93,7 @@ public class ProjectService {
     }
 
     public Page<Project> getAllProjects(int page) {
-        Pageable pageable = PageRequest.of(page, 20);
+        Pageable pageable = PageRequest.of(page, 10);
         return projectRepository.findAll(pageable);
     }
 
@@ -102,7 +103,7 @@ public class ProjectService {
         if (company == null) {
             return null;
         }
-        Pageable pageable = PageRequest.of(page, 20);
+        Pageable pageable = PageRequest.of(page, 5);
         return projectRepository.findAllByCompanyName(company.getName(), pageable);
     }
 

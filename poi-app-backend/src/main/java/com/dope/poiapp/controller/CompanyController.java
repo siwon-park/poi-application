@@ -33,9 +33,10 @@ public class CompanyController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PutMapping("/company/update")
-    public void updateCompany(@RequestBody CompanyRequestDto requestDto) {
-//        companyService.saveCompany(requestDto);
+    @PutMapping("/company/update/{id}")
+    public ResponseEntity<Company> updateCompany(@PathVariable long id, @RequestBody CompanyRequestDto requestDto) {
+        Company company = companyService.updateCompany(id, requestDto);
+        return ResponseEntity.ok(company);
     }
 
     @DeleteMapping("/company/{id}")

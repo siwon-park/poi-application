@@ -54,4 +54,8 @@ public class Company {
     public void updateActive(boolean flag) {
         this.isActive = flag;
     }
+
+    public void updateAliasNames(List<String> aliasNames) {
+        this.aliasNames = aliasNames;
+    }
 }
