@@ -12,7 +12,7 @@ interface EditCompanyModalProps {
 interface CompanyFormData {
   name: string;
   address: string;
-  affiliates: string[];
+  aliasNames: string[];
 }
 
 export default function EditCompanyModal({ 
@@ -30,23 +30,29 @@ export default function EditCompanyModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submitting form data:', formData);
     onSubmit(formData);
     onClose();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    console.log('Input changed:', name, value);
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: value
+      };
+      console.log('New form data:', newData);
+      return newData;
+    });
   };
 
   const handleAddAffiliate = () => {
     if (affiliateInput.trim()) {
       setFormData(prev => ({
         ...prev,
-        affiliates: [...prev.affiliates, affiliateInput.trim()]
+        aliasNames: [...prev.aliasNames, affiliateInput.trim()]
       }));
       setAffiliateInput('');
     }
@@ -55,7 +61,7 @@ export default function EditCompanyModal({
   const handleRemoveAffiliate = (indexToRemove: number) => {
     setFormData(prev => ({
       ...prev,
-      affiliates: prev.affiliates.filter((_, index) => index !== indexToRemove)
+      aliasNames: prev.aliasNames.filter((_, index) => index !== indexToRemove)
     }));
   };
 
@@ -152,12 +158,12 @@ export default function EditCompanyModal({
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {formData.affiliates.map((affiliate, index) => (
+                {formData.aliasNames.map((alias, index) => (
                   <div
                     key={index}
                     className="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full"
                   >
-                    <span>{affiliate}</span>
+                    <span>{alias}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveAffiliate(index)}

@@ -49,7 +49,7 @@ interface ProjectFormData {
 
 const ITEMS_PER_PAGE = 5;
 
-export default function CompanyDetailPage({ params }: { params: { id: string } }) {
+export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [company, setCompany] = useState<Company | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -58,11 +58,22 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [companyId, setCompanyId] = useState<string>('');
+
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setCompanyId(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
 
   useEffect(() => {
     const fetchCompany = async () => {
+      if (!companyId) return;
+      
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/company/${params.id}`);
+        const response = await fetch(`http://localhost:8080/api/v1/company/${companyId}`);
         const data = await response.json();
         console.log(data);
         setCompany(data);
@@ -72,14 +83,14 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
     };
 
     fetchCompany();
-  }, [params.id]);
+  }, [companyId]);
 
   useEffect(() => {
     // TODO: API에서 실제 프로젝트 데이터 가져오기
     const fetchProjects = async () => {
       // 임시 데이터
       const dummyProjects: Project[] = Array.from({ length: 12 }, (_, i) => ({
-        id: i + 1,
+        id: String(i + 1),
         title: `프로젝트 ${i + 1}`,
         description: `이것은 프로젝트 ${i + 1}의 설명입니다.`,
         status: i % 3 === 0 ? '진행중' : i % 3 === 1 ? '완료' : '계획중',
@@ -100,10 +111,39 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
 
   const handleEdit = async (data: CompanyFormData) => {
     try {
-      // TODO: API 호출로 데이터 업데이트
-      if (company) {
-        setCompany({ ...data, id: company.id });
+      if (!company) return;
+      
+      console.log('Received form data:', data);
+      
+      // 데이터 유효성 검사
+      if (!data.name || !data.address) {
+        throw new Error('회사명과 주소는 필수 입력값입니다.');
       }
+      
+      const requestData = {
+        companyName: data.name.trim(),
+        companyAddress: data.address.trim(),
+        aliasNames: data.aliasNames || []
+      };
+      
+      console.log('Sending request data:', requestData);
+      
+      const response = await fetch(`http://localhost:8080/api/v1/company/update/${companyId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error('회사 정보 수정에 실패했습니다.');
+      }
+
+      const updatedCompany = await response.json();
+      console.log('Updated company data:', updatedCompany);
+      
+      setCompany(updatedCompany);
       setIsEditModalOpen(false);
     } catch (error) {
       console.error('회사 정보 수정 중 오류가 발생했습니다:', error);
@@ -223,7 +263,7 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
             totalPages={totalPages}
             onPageChange={handlePageChange}
             onRegisterProject={handleRegisterProject}
-            companyId={params.id}
+            companyId={companyId}
           />
         </div>
       </div>
@@ -232,7 +272,15 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSubmit={handleEdit}
-        initialData={company}
+        initialData={company ? {
+          name: company.name,
+          address: company.address,
+          aliasNames: company.aliasNames
+        } : {
+          name: '',
+          address: '',
+          aliasNames: []
+        }}
       />
 
       <DeleteConfirmModal
