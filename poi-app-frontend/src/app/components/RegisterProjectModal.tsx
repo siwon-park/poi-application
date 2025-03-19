@@ -22,17 +22,18 @@ interface ProjectFormData {
 
 // 임시 데이터 (실제로는 API에서 가져와야 함)
 const PROJECT_MANAGERS = [
-  '김철수',
-  '이영희',
-  '박지성',
-  '손흥민',
+  '구경모',
+  '최경환',
+  '박시원',
+  '박재은',
+  '김세현'
 ];
 
 const SUBCONTRACTORS = [
+  '스윗코드',
+  '엑시스',
   '하도급사 A',
   '하도급사 B',
-  '하도급사 C',
-  '하도급사 D',
 ];
 
 export default function RegisterProjectModal({

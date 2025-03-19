@@ -3,98 +3,99 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import EditProjectModal from '../../../components/EditProjectModal';
-import DeleteProjectModal from '../../../components/DeleteProjectModal';
+import Image from 'next/image';
+import { use } from 'react';
+import EditProjectModal from '@/app/components/EditProjectModal';
+import DeleteProjectModal from '@/app/components/DeleteProjectModal';
 
 interface Project {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  status: '진행중' | '완료' | '계획중';
+  status: string;
   startDate: string;
-  endDate?: string;
+  endDate: string | null;
   projectManager: string;
-  hasSubcontractor: boolean;
-  subcontractor?: string;
-  clientManager: string;
+  hasOutSourcing: boolean;
+  customer: string;
 }
 
-export default function ProjectDetailPage({
-  params,
-}: {
-  params: { id: string; projectId: string };
-}) {
+export default function ProjectDetailPage({ params }: { params: Promise<{ id: string; projectId: string }> }) {
+  const resolvedParams = use(params);
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    // TODO: API에서 실제 프로젝트 데이터 가져오기
     const fetchProject = async () => {
       try {
-        // 임시 데이터
-        const dummyProject: Project = {
-          id: params.projectId,
-          title: `프로젝트 ${params.projectId}`,
-          description: '이것은 프로젝트에 대한 상세한 설명입니다.',
-          status: '진행중',
-          startDate: '2024-01-01',
-          endDate: '2024-12-31',
-          projectManager: '김철수',
-          hasSubcontractor: true,
-          subcontractor: '하도급사 A',
-          clientManager: '이영희',
-        };
-
-        setProject(dummyProject);
+        const response = await fetch(`http://localhost:8080/api/v1/project/${resolvedParams.projectId}`);
+        if (!response.ok) {
+          throw new Error('프로젝트를 찾을 수 없습니다.');
+        }
+        const data = await response.json();
+        setProject(data);
       } catch (error) {
-        console.error('프로젝트 정보를 불러오는 중 오류 발생:', error);
+        console.error('프로젝트 정보를 불러오는 중 오류가 발생했습니다:', error);
         alert('프로젝트 정보를 불러오는데 실패했습니다.');
+        router.push(`/${resolvedParams.id}`);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchProject();
-  }, [params.projectId]);
+  }, [resolvedParams.projectId, router, resolvedParams.id]);
 
   const handleEdit = async (data: Omit<Project, 'id'>) => {
     try {
-      // TODO: API 호출로 프로젝트 정보 업데이트
-      setProject({ ...data, id: project!.id });
+      const response = await fetch(
+        `http://localhost:8080/api/v1/project/${resolvedParams.projectId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('프로젝트 수정에 실패했습니다.');
+      }
+
+      const updatedProject = await response.json();
+      setProject(updatedProject);
       setIsEditModalOpen(false);
     } catch (error) {
-      console.error('프로젝트 수정 중 오류 발생:', error);
+      console.error('프로젝트 수정 중 오류가 발생했습니다:', error);
       alert('프로젝트 수정에 실패했습니다.');
     }
   };
 
   const handleDelete = async () => {
     try {
-      // TODO: API 호출로 프로젝트 삭제
-      router.push(`/${params.id}`);  // 회사 상세 페이지로 이동
+      const response = await fetch(
+        `http://localhost:8080/api/v1/project/${resolvedParams.projectId}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('프로젝트 삭제에 실패했습니다.');
+      }
+
+      router.push(`/${resolvedParams.id}`);
     } catch (error) {
-      console.error('프로젝트 삭제 중 오류 발생:', error);
+      console.error('프로젝트 삭제 중 오류가 발생했습니다:', error);
       alert('프로젝트 삭제에 실패했습니다.');
     }
   };
 
-  const getStatusColor = (status: Project['status']) => {
-    switch (status) {
-      case '진행중':
-        return 'bg-blue-100 text-blue-800';
-      case '완료':
-        return 'bg-green-100 text-green-800';
-      case '계획중':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">로딩 중...</div>
@@ -105,15 +106,7 @@ export default function ProjectDetailPage({
   if (!project) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <p className="text-xl mb-4">프로젝트를 찾을 수 없습니다.</p>
-          <Link
-            href={`/${params.id}`}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            회사 페이지로 돌아가기
-          </Link>
-        </div>
+        <div className="text-center">프로젝트를 찾을 수 없습니다.</div>
       </div>
     );
   }
@@ -122,7 +115,7 @@ export default function ProjectDetailPage({
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
         <Link
-          href={`/${params.id}`}
+          href={`/${resolvedParams.id}`}
           className="text-gray-600 hover:text-black transition-colors inline-flex items-center gap-2"
         >
           <svg
@@ -138,104 +131,76 @@ export default function ProjectDetailPage({
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          목록으로 돌아가기
+          회사 상세로 돌아가기
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-8">
+      <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="flex justify-between items-start mb-6">
-          <h1 className="text-3xl font-bold">{project.title}</h1>
-          <span
-            className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(
-              project.status
-            )}`}
-          >
+          <h1 className="text-3xl font-bold">{project.name}</h1>
+          <span className={`px-3 py-1 rounded-full text-sm ${
+            project.status === '진행중' ? 'bg-green-100 text-green-800' :
+            project.status === '완료' ? 'bg-blue-100 text-blue-800' :
+            'bg-gray-100 text-gray-800'
+          }`}>
             {project.status}
           </span>
         </div>
 
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold mb-3">프로젝트 설명</h2>
-            <p className="text-gray-600 whitespace-pre-line">{project.description}</p>
+            <h2 className="text-lg font-semibold mb-2">프로젝트 설명</h2>
+            <p className="text-gray-600">{project.description}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <h2 className="text-lg font-semibold mb-2">PM</h2>
-              <p className="text-gray-600">{project.projectManager}</p>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold mb-2">고객사 담당자</h2>
-              <p className="text-gray-600">{project.clientManager}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-lg font-semibold mb-2">시작일</h2>
-              <p className="text-gray-600">{project.startDate}</p>
-            </div>
-            {project.endDate && (
-              <div>
-                <h2 className="text-lg font-semibold mb-2">종료일</h2>
-                <p className="text-gray-600">{project.endDate}</p>
+              <h2 className="text-lg font-semibold mb-2">프로젝트 정보</h2>
+              <div className="space-y-2">
+                <p><span className="font-medium">프로젝트 매니저:</span> {project.projectManager}</p>
+                <p><span className="font-medium">고객사 담당자:</span> {project.customer}</p>
+                <p><span className="font-medium">시작일:</span> {project.startDate.split('T')[0]}</p>
+                <p><span className="font-medium">종료일:</span> {project.endDate ? project.endDate.split('T')[0] : '미정'}</p>
+                <p><span className="font-medium">외주 여부:</span> {project.hasOutSourcing ? '예' : '아니오'}</p>
               </div>
-            )}
+            </div>
           </div>
+        </div>
 
-          {project.hasSubcontractor && (
-            <div>
-              <h2 className="text-lg font-semibold mb-2">하도급사</h2>
-              <p className="text-gray-600">{project.subcontractor}</p>
-            </div>
-          )}
-
-          <div className="flex justify-between gap-3 pt-6 mt-6 border-t">
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  // TODO: 기능 구현
-                  alert('아직 구현되지 않은 기능입니다.');
-                }}
-                className="px-4 py-2 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors inline-flex items-center gap-2"
-              >
-                <img
-                  src="/images/excel_logo.png"
-                  alt="Excel"
-                  className="w-5 h-5"
-                />
-                엑셀 다운
-              </button>
-              <button
-                onClick={() => {
-                  // TODO: 기능 구현
-                  alert('아직 구현되지 않은 기능입니다.');
-                }}
-                className="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors inline-flex items-center gap-2"
-              >
-                <img
-                  src="/images/word_logo.png"
-                  alt="Word"
-                  className="w-5 h-5"
-                />
-                워드 다운
-              </button>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setIsEditModalOpen(true)}
-                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                수정
-              </button>
-              <button
-                onClick={() => setIsDeleteModalOpen(true)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                삭제
-              </button>
-            </div>
+        <div className="mt-8 flex justify-between items-center">
+          <div className="flex gap-4">
+            <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors">
+              <Image
+                src="/images/excel_logo.png"
+                alt="Excel"
+                width={20}
+                height={20}
+              />
+              엑셀 출력
+            </button>
+            <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+              <Image
+                src="/images/word_logo.png"
+                alt="Word"
+                width={20}
+                height={20}
+              />
+              워드 출력
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              수정
+            </button>
+            <button
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              삭제
+            </button>
           </div>
         </div>
       </div>
@@ -251,7 +216,7 @@ export default function ProjectDetailPage({
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
-        projectTitle={project.title}
+        projectTitle={project.name}
       />
     </div>
   );

@@ -86,28 +86,37 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   }, [companyId]);
 
   useEffect(() => {
-    // TODO: API에서 실제 프로젝트 데이터 가져오기
     const fetchProjects = async () => {
-      // 임시 데이터
-      const dummyProjects: Project[] = Array.from({ length: 12 }, (_, i) => ({
-        id: String(i + 1),
-        title: `프로젝트 ${i + 1}`,
-        description: `이것은 프로젝트 ${i + 1}의 설명입니다.`,
-        status: i % 3 === 0 ? '진행중' : i % 3 === 1 ? '완료' : '계획중',
-        startDate: '2024-01-01',
-        endDate: i % 2 === 0 ? '2024-12-31' : undefined,
-        projectManager: '김프로젝트매니저',
-        hasSubcontractor: i % 2 === 0,
-        subcontractor: i % 2 === 0 ? '이서브계약사' : undefined,
-        clientManager: '박클라이언트매니저'
-      }));
+      if (!companyId) return;
+      
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/company/${companyId}/list?&page=${currentPage - 1}`
+        );
+        const data = await response.json();
+        console.log(data);
+        // API 응답 데이터를 Project 인터페이스에 맞게 변환
+        const projects: Project[] = data.content.map((project: any) => ({
+          id: String(project.id),
+          title: project.name,
+          description: project.description,
+          status: project.status || '계획중',
+          startDate: project.startDate.split('T')[0],
+          endDate: project.endDate ? project.endDate.split('T')[0] : undefined,
+          projectManager: project.projectManager,
+          hasSubcontractor: project.hasOutSourcing,
+          clientManager: project.customer
+        }));
 
-      setProjects(dummyProjects);
-      setTotalPages(Math.ceil(dummyProjects.length / ITEMS_PER_PAGE));
+        setProjects(projects);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error('프로젝트 목록을 불러오는 중 오류가 발생했습니다:', error);
+      }
     };
 
     fetchProjects();
-  }, []);
+  }, [companyId, currentPage]);
 
   const handleEdit = async (data: CompanyFormData) => {
     try {
@@ -167,23 +176,42 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
   const handleRegisterProject = async (data: Omit<Project, 'id'>) => {
     try {
-      // TODO: API 호출로 프로젝트 등록
-      const newProject: Project = {
-        ...data,
-        id: String(projects.length + 1), // 임시 ID 생성
+      if (!company) return;
+
+      const requestData = {
+        projectName: data.title,
+        projectManager: data.projectManager,
+        projectDescription: data.description,
+        projectCustomer: data.clientManager,
+        companyName: company.name,
+        hasOutSourcing: data.hasSubcontractor,
+        startDate: `${data.startDate}T00:00:00`,
+        endDate: data.endDate ? `${data.endDate}T00:00:00` : null
       };
+
+      console.log('Request data:', requestData);
+
+      const response = await fetch('http://localhost:8080/api/v1/project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+      
+      console.log('Response:', response);
+      if (!response.ok) {
+        throw new Error('프로젝트 등록에 실패했습니다.');
+      }
+
+      // TODO: API 응답으로 받은 프로젝트 데이터로 상태 업데이트
+      const newProject = await response.json();
       setProjects(prev => [...prev, newProject]);
       setIsModalOpen(false);
     } catch (error) {
       console.error('프로젝트 등록 중 오류가 발생했습니다:', error);
       alert('프로젝트 등록에 실패했습니다.');
     }
-  };
-
-  const getCurrentPageProjects = () => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return projects.slice(startIndex, endIndex);
   };
 
   return (
@@ -258,7 +286,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         {/* 프로젝트 목록 */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <ProjectList
-            projects={getCurrentPageProjects()}
+            projects={projects}
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
