@@ -1,5 +1,6 @@
 package com.dope.poiapp.service;
 
+import com.dope.poiapp.domain.entity.Company;
 import com.dope.poiapp.domain.entity.Project;
 import com.dope.poiapp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +35,15 @@ public class PoiService {
     /**
      * TODO: project나 company 객체를 사용하지 말고 DTO 사용으로 변경 필요 (25-02-01)
      * */
-    public byte[] generateWordDocx(long pid) throws IOException {
+    public byte[] generateWordDocx(long id) throws IOException {
         FileInputStream fis = new FileInputStream(wordTemplateFilePath); // "C:\\Users\\zow77\\Downloads\\WordTemplate.docx"
         XWPFDocument document = new XWPFDocument(fis);
         List<XWPFParagraph> paragraphs = document.getParagraphs(); // 문서 패러그래프의 정보
-        Project project = projectRepository.findById(pid).orElseThrow();
+        Project project = projectRepository.findById(id).orElseThrow();
         String company = project.getCompany().getName();
         LocalDateTime finishDate = project.getEndDate();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String finDate = dtf.format(finishDate);
-
-        DateTimeFormatter dtf2 =  DateTimeFormatter.ofPattern("yyMMdd");
-        String newFileName = "개발완료확인서_" + company + "_" + dtf2.format(finishDate) + ".docx";
 
         XWPFRun run;
         run = paragraphs.get(19).getRuns().get(0); // 19번째 패러그래프의 런 정보의 첫번째 값부터 가져옴; 날짜
@@ -135,8 +133,8 @@ public class PoiService {
         return fos.toByteArray();
     }
 
-    public byte[] generateExcel(long pid) throws IOException {
-        Project project = projectRepository.findById(pid).orElseThrow(null);
+    public byte[] generateExcel(long id) throws IOException {
+        Project project = projectRepository.findById(id).orElseThrow(null);
         if (project == null) {
             return null;
         }
@@ -166,5 +164,11 @@ public class PoiService {
         return fos.toByteArray();
     }
 
+    public String generateFileName(long id, String suffix) {
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyMMdd");
+        Project project = projectRepository.findById(id).orElseThrow(null);
+        String companyName = project.getCompany().getName();
+        return suffix + "_" + companyName + "_" + dtf.format(LocalDateTime.now());
+    }
 
 }

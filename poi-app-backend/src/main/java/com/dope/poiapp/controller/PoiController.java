@@ -23,12 +23,11 @@ public class PoiController {
     // TO-DO: ResponseBody로 수정하여 결과에 따른 리턴 코드 분기화 필요
     // 200: 성공, 401: Unauthorized (인증 정보 없음), 403: Forbidden (권한 없음), 404: Not Found
     @GetMapping("/download/word/{pid}")
-    public ResponseEntity<byte[]> downloadWord(@PathVariable long pid) throws Exception {
-        byte[] wordContent = poiService.generateWordDocx(pid);
-
+    public ResponseEntity<byte[]> downloadWord(@PathVariable long id) throws Exception {
+        byte[] wordContent = poiService.generateWordDocx(id);
+        String fileName = poiService.generateFileName(id, "개발완료확인서");
         HttpHeaders headers = new HttpHeaders();
-        // TODO: 파일명 생성 로직 수정
-        headers.setContentDispositionFormData("attachment", "sample.docx");
+        headers.setContentDispositionFormData("attachment", fileName + ".docx");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
         return ResponseEntity.ok()
@@ -37,11 +36,12 @@ public class PoiController {
     }
 
     @GetMapping("/download/excel/{pid}")
-    public ResponseEntity<byte[]> downloadExcel(@PathVariable long pid) throws Exception {
-        byte[] excelContent = poiService.generateExcel(pid);
+    public ResponseEntity<byte[]> downloadExcel(@PathVariable long id) throws Exception {
+        byte[] excelContent = poiService.generateExcel(id);
+        String fileName = poiService.generateFileName(id, "하도급계약서");
         HttpHeaders headers = new HttpHeaders();
-        // TODO: 파일명 생성 로직 수정
-        headers.setContentDispositionFormData("attachment", "sample.xlsx");
+        // TODO: 하도급사명을 파일명에 추가하기
+        headers.setContentDispositionFormData("attachment", fileName + ".xlsx");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return ResponseEntity.ok()
                 .headers(headers)

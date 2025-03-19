@@ -21,10 +21,10 @@ public class ProjectController {
         return projectService.getProject(id);
     }
 
-    @PostMapping("/project/")
-    public ResponseEntity<String> createProject(@RequestBody ProjectRequestDto requestDto) {
-        projectService.createProject(requestDto);
-        return ResponseEntity.ok().body("sucess");
+    @PostMapping("/project")
+    public ResponseEntity<Project> createProject(@RequestBody ProjectRequestDto requestDto) {
+        Project project = projectService.createProject(requestDto);
+        return ResponseEntity.ok(project);
     }
 
     @PutMapping("/project/{id}")
@@ -38,8 +38,9 @@ public class ProjectController {
         projectService.deleteProject(id);
     }
 
-    @GetMapping("/project/list/")
+
+/*    @GetMapping("/project/list")
     public Page<Project> getProjectList(@RequestParam(value = "page", defaultValue = "0") int page) {
         return projectService.getAllProjects(page);
-    }
+    }*/
 }

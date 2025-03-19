@@ -45,24 +45,31 @@ public class ProjectService {
         return projects;
     }
 
-    public void createProject(ProjectRequestDto requestDto) {
+    public Project createProject(ProjectRequestDto requestDto) {
+        System.out.println(requestDto.getProjectName());
+        System.out.println(requestDto.getProjectDescription());
+        System.out.println(requestDto.getProjectManager());
+        System.out.println(requestDto.getProjectCustomer());
+        System.out.println(requestDto.getProjectName());
+        System.out.println(requestDto.getProjectName());
         Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
         if (company == null) {
             // 회사가 없으므로 프로젝트를 등록 못함
-            return;
+            return null;
         }
         // 신규 프로젝트
         Project project = Project.builder()
                 .name(requestDto.getProjectName())
                 .description(requestDto.getProjectDescription())
                 .projectManager(requestDto.getProjectManager())
+                .customer(requestDto.getProjectCustomer())
                 .company(company)
                 .startDate(requestDto.getStartDate())
                 .endDate(requestDto.getEndDate())
                 .hasOutSourcing(requestDto.isHasOutSourcing())
                 .build();
         projectRepository.save(project);
-        return;
+        return project;
     }
 
     public void updateProject(long id, ProjectRequestDto requestDto) {
