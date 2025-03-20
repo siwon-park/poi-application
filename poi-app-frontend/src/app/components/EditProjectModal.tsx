@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 
 interface ProjectFormData {
+  id?: string;
   name: string;
   description: string;
   status: string;
@@ -13,6 +14,7 @@ interface ProjectFormData {
   projectManager: string;
   hasOutSourcing: boolean;
   customer: string;
+  companyName: string;
 }
 
 interface EditProjectModalProps {
@@ -45,6 +47,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     projectManager: '',
     hasOutSourcing: false,
     customer: '',
+    companyName: '',
   });
 
   useEffect(() => {

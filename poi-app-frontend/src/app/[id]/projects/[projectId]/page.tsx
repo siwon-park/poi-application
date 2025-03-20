@@ -18,6 +18,7 @@ interface Project {
   projectManager: string;
   hasOutSourcing: boolean;
   customer: string;
+  companyName: string;
 }
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string; projectId: string }> }) {
@@ -51,6 +52,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   const handleEdit = async (data: Omit<Project, 'id'>) => {
     try {
+      const requestData = {
+        projectName: data.name,
+        projectManager: data.projectManager,
+        projectDescription: data.description,
+        projectCustomer: data.customer,
+        companyName: data.companyName,
+        hasOutSourcing: data.hasOutSourcing,
+        startDate: `${data.startDate}T00:00:00`,
+        endDate: data.endDate ? `${data.endDate}T00:00:00` : null
+      };
+
       const response = await fetch(
         `http://localhost:8080/api/v1/project/${resolvedParams.projectId}`,
         {
@@ -58,10 +70,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(requestData),
         }
       );
-
+      console.log(requestData)
       if (!response.ok) {
         throw new Error('프로젝트 수정에 실패했습니다.');
       }
@@ -92,6 +104,24 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     } catch (error) {
       console.error('프로젝트 삭제 중 오류가 발생했습니다:', error);
       alert('프로젝트 삭제에 실패했습니다.');
+    }
+  };
+
+  const handleExcelDownload = async () => {
+    try {
+      window.location.href = `http://localhost:8080/api/v1/download/excel/${resolvedParams.projectId}`;
+    } catch (error) {
+      console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+      alert('엑셀 다운로드에 실패했습니다.');
+    }
+  };
+
+  const handleWordDownload = async () => {
+    try {
+      window.location.href = `http://localhost:8080/api/v1/download/word/${resolvedParams.projectId}`;
+    } catch (error) {
+      console.error('워드 다운로드 중 오류가 발생했습니다:', error);
+      alert('워드 다운로드에 실패했습니다.');
     }
   };
 
@@ -169,7 +199,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
         <div className="mt-8 flex justify-between items-center">
           <div className="flex gap-4">
-            <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors">
+            <button 
+              onClick={handleExcelDownload}
+              className="inline-flex items-center gap-2 px-4 py-2 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors"
+            >
               <Image
                 src="/images/excel_logo.png"
                 alt="Excel"
@@ -178,7 +211,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               />
               엑셀 출력
             </button>
-            <button className="inline-flex items-center gap-2 px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+            <button 
+              onClick={handleWordDownload}
+              className="inline-flex items-center gap-2 px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+            >
               <Image
                 src="/images/word_logo.png"
                 alt="Word"
