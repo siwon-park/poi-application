@@ -72,25 +72,26 @@ public class ProjectService {
         return project;
     }
 
-    public void updateProject(long id, ProjectRequestDto requestDto) {
+    public Project updateProject(long id, ProjectRequestDto requestDto) {
         Project project = projectRepository.findById(id).orElse(null);
         if (project == null) { // 프로젝트가 없으므로 수정 못함
-            return;
+            System.out.println("project: " + null);
+            return null;
         }
-        Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
+/*        Company company = companyRepository.findByName(requestDto.getCompanyName()).orElse(null);
         if (company == null) { // 회사가 없으므로 수정 못함
-            return;
-        }
+            return null;
+        }*/
         project.updateName(requestDto.getProjectName());
         project.updateProjectManager(requestDto.getProjectManager());
         project.updateDescription(requestDto.getProjectDescription());
-        project.updateCompany(company);
+//        project.updateCompany(company);
         project.updateCustomer(requestDto.getProjectCustomer());
         project.updateStartDate(requestDto.getStartDate());
         project.updateEndDate(requestDto.getEndDate());
         project.updateHasOutSourcing(requestDto.isHasOutSourcing());
         projectRepository.save(project);
-        return;
+        return project;
     }
 
     // 프로젝트는 hard delete

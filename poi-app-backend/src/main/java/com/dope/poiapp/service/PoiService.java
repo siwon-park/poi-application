@@ -24,16 +24,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PoiService {
 
-    @Value("${file.template.path}")
+    @Value("${file.template.docx.path:src/main/resources/static/files/WordTemplate.docx}")
     private String wordTemplateFilePath;
 
-    @Value("src/main/resources/static/files/ExcelTemplate.xlsx")
+    @Value("${file.template.xlsx.path:src/main/resources/static/files/ExcelTemplate.xlsx}")
     private String excelTemplateFilePath;
 
     private final ProjectRepository projectRepository;
 
     /**
-     * TODO: project나 company 객체를 사용하지 말고 DTO 사용으로 변경 필요 (25-02-01)
+     * TODO:
      * */
     public byte[] generateWordDocx(long id) throws IOException {
         FileInputStream fis = new FileInputStream(wordTemplateFilePath); // "C:\\Users\\zow77\\Downloads\\WordTemplate.docx"
@@ -147,7 +147,7 @@ public class PoiService {
         row.getCell(4).setCellValue(project.getName()); // 프로젝트명
         row.getCell(5).setCellValue(project.getDescription()); // 프로젝트 내용
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        LocalDateTime startDate = project.getStartDate();
+        LocalDateTime startDate = project.getStartDate().plusDays(7); // 하도급 계약서는 시작 기간을 일주일 더잡음
         LocalDateTime endDate = project.getEndDate();
         row.getCell(6).setCellValue(dtf.format(startDate) + " ~ " + dtf.format(endDate));
         // TODO: 프로젝트에 있는 데이터를 적절히 뽑아서 엑셀화 필요 -> 현재는 다운로드까지만 테스트함

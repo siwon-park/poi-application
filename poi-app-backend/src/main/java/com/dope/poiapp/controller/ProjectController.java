@@ -28,9 +28,9 @@ public class ProjectController {
     }
 
     @PutMapping("/project/{id}")
-    public ResponseEntity<String> updateProject(@PathVariable long id, @RequestBody ProjectRequestDto requestDto) {
-        projectService.updateProject(id, requestDto);
-        return ResponseEntity.ok().body("sucess");
+    public ResponseEntity<Project> updateProject(@PathVariable long id, @RequestBody ProjectRequestDto requestDto) {
+        Project project = projectService.updateProject(id, requestDto);
+        return ResponseEntity.ok(project);
     }
 
     @DeleteMapping("/project/{id}")
